@@ -1,5 +1,4 @@
 # 쿼리싱크 대시보드 🚀
-19.1
 
 ![Build Status](https://img.shields.io/badge/build-passing-brightgreen)
 ![React](https://img.shields.io/badge/React-v19.1-blue?logo=react&logoColor=white)
