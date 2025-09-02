@@ -1,14 +1,20 @@
-import { useState } from 'react'
-// import reactLogo from './assets/react.svg'
-// import viteLogo from '/vite.svg'
-import './App.css'
-import Dashboard from "./pages/Dashboard.jsx"
+import { useState } from 'react';
+import {Routes,Route} from "react-router-dom";
+import './App.css';
+import Dashboard from "./pages/Dashboard.jsx";
+import { fakeQueryData } from './data/mockData.js';
+import AddQuery from './pages/AddQuery.jsx';
 
 function App() {
-  //className="min-h-screen bg-gray-100"
+  //쿼리리스트 데이터 상태관리
+  const [queryList, setQueryList] = useState(fakeQueryData);
+
   return (
     <div>
-      <Dashboard/>
+      <Routes>
+        <Route path="/" element={<Dashboard list = {queryList} />} />
+        <Route path="/add" element={<AddQuery />} />
+      </Routes>
     </div>
   )
 }

@@ -2,6 +2,7 @@ import react from "react";
 
 function CardGrid({list}) {
 
+    // 쿼리리스트 카운팅 변수 선언
     const count = list.length;
     const success = list.filter((v)=>v.status===true).length;
     const fail = list.filter((v)=>v.status===false).length;
