@@ -11,8 +11,9 @@ function App() {
 
   //AddQuery에서 리스트 추가
   const handleAddQuery = (newQueryData) => {
-    console.log("AddQuery에서 추가한 데이터:", newQueryData);
-    //★ 다시 Dashboard로 뿌려주기
+    // 전개구문 사용해서 불변데이터 업데이트하기
+    const newQuery = [...queryList, newQueryData];
+    setQueryList(newQuery);
   };
 
   return (
