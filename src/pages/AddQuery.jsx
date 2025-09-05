@@ -8,17 +8,24 @@ function AddQuery({ onAdd }) {
   const [sqlQuery, setSqlQuery] = useState("");
 
   const navigate = useNavigate(); //네비게이터 추가
-
+  
+  const today = new Date().toISOString().slice(0, 19).replace('T', ' ');
+  
   const handleSubmit = (e) => {
     e.preventDefault(); //submit 이벤트 막기
 
-    //★ 입력유효성검증코드 추가하기
+    //유효성 검사
+    if (!queryId.trim() || !queryName.trim() || !sqlQuery.trim()) {
+      alert('모든 필드를 입력해주세요!');
+      return;
+    }
 
     //newQuery : 폼 입력값 객체로 생성
     const newQueryData = {
       id: queryId,
       name: queryName,
       query: sqlQuery,
+      lastRun: today,
     };
 
     onAdd(newQueryData);
@@ -27,12 +34,14 @@ function AddQuery({ onAdd }) {
 
   return (
     <div>
+      {/* 대시보드로  되돌아가기 버튼 */}
       <Link to="/">
         <button className="rounded border border-blue-500 bg-transparent px-3 py-1 font-semibold text-blue-700 hover:border-transparent hover:bg-blue-500 hover:text-white">
           x
         </button>
       </Link>
       <h1 className="col-span-2 py-3 text-left text-2xl font-bold">쿼리정보</h1>
+      {/* 폼 구현 */}
       <form onSubmit={handleSubmit} className="grid grid-cols-2 border">
         <div className="">
           <label className="px-3">쿼리 ID</label>
