@@ -8,15 +8,13 @@ function AddQuery({ onAdd }) {
   const [sqlQuery, setSqlQuery] = useState("");
 
   const navigate = useNavigate(); //네비게이터 추가
-  
-  const today = new Date().toISOString().slice(0, 19).replace('T', ' ');
-  
+
   const handleSubmit = (e) => {
     e.preventDefault(); //submit 이벤트 막기
 
     //유효성 검사
     if (!queryId.trim() || !queryName.trim() || !sqlQuery.trim()) {
-      alert('모든 필드를 입력해주세요!');
+      alert("모든 필드를 입력해주세요!");
       return;
     }
 
@@ -25,7 +23,6 @@ function AddQuery({ onAdd }) {
       id: queryId,
       name: queryName,
       query: sqlQuery,
-      lastRun: today,
     };
 
     onAdd(newQueryData);
@@ -49,6 +46,7 @@ function AddQuery({ onAdd }) {
             type="text"
             value={queryId}
             onChange={(e) => setQueryId(e.target.value)}
+            placeholder="ex) Q001"
             className="rounded border border-gray-300 bg-gray-50 p-2 text-gray-900"
           />
         </div>
@@ -58,6 +56,7 @@ function AddQuery({ onAdd }) {
             type="text"
             value={queryName}
             onChange={(e) => setQueryName(e.target.value)}
+            placeholder="ex) 판매전환 중복건 검증"
             className="rounded border border-gray-300 bg-gray-50 p-2 text-gray-900"
           />
         </div>
@@ -67,6 +66,7 @@ function AddQuery({ onAdd }) {
             type="textarea"
             value={sqlQuery}
             onChange={(e) => setSqlQuery(e.target.value)}
+            placeholder="ex) SELECT * FROM sales WHERE status = 'CANCELLED'"
             className="w-full rounded border border-gray-300 bg-gray-50 text-gray-900"
           />
           <button

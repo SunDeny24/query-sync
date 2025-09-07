@@ -8,12 +8,24 @@ import AddQuery from "./pages/AddQuery.jsx";
 function App() {
   //쿼리리스트 데이터 상태관리
   const [queryList, setQueryList] = useState(fakeQueryData);
+  const today = new Date().toISOString().slice(0, 19).replace("T", " ");
 
   //AddQuery에서 리스트 추가
   const handleAddQuery = (newQueryData) => {
-    // 전개구문 사용해서 불변데이터 업데이트하기
-    const newQuery = [...queryList, newQueryData];
-    setQueryList(newQuery);
+    //api로 전송할 데이터 받아오기
+    const apiResult = {
+      lastRun: today,
+      status: true, //임시로 불리언값 넘기기
+    };
+    console.log("apiResult : ", apiResult);
+
+    //최종결과 합치기
+    const finalResult = {
+      ...newQueryData,
+      ...apiResult,
+    };
+
+    setQueryList([...queryList, finalResult]);
   };
 
   return (
