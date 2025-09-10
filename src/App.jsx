@@ -46,7 +46,7 @@ function App() {
     fetchData();
   }, []);
 
-  /*===================AddQuery 된 부분 추가 예정============================ */
+  /*====================AddQuery 된 부분 추가 예정============================ */
   //AddQuery에서 리스트 추가하는 함수
   const handleAddQuery = (newQueryData) => {
     //api로 전송할 데이터 받아오기
