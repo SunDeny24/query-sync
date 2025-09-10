@@ -1,0 +1,48 @@
+{
+  "queryDefinitions": [
+    {
+      "id": "Q001",
+      "name": "판매전환 중복건검증",
+      "query": "SELECT sale_id, COUNT(*) FROM sales GROUP BY sale_id HAVING COUNT(*) > 1;"
+    },
+    {
+      "id": "Q002",
+      "name": "원영수증 누락건",
+      "query": "SELECT * FROM receipts WHERE original_receipt_id IS NULL;"
+    },
+    {
+      "id": "Q003",
+      "name": "판매전환의 예약취소건",
+      "query": "SELECT * FROM sales WHERE status = 'CANCELLED' AND type = 'RESERVATION';"
+    }
+  ],
+  "queryResults": [
+    {
+      "id": "Q001",
+      "lastRun": "2025-09-08 10:30:15",
+      "status": true,
+      "resultData": [
+        { "sale_id": "S1024", "COUNT(*)": 2 },
+        { "sale_id": "S1055", "COUNT(*)": 3 }
+      ],
+      "error": null
+    },
+    {
+      "id": "Q002",
+      "lastRun": "2025-09-08 10:30:15",
+      "status": true,
+      "resultData": [
+        { "receipt_id": "R9001", "amount": 50000, "original_receipt_id": null },
+        { "receipt_id": "R9002", "amount": 12000, "original_receipt_id": null }
+      ],
+      "error": null
+    },
+    {
+      "id": "Q003",
+      "lastRun": "2025-09-08 10:30:15",
+      "status": false,
+      "resultData": [],
+      "error": "ORA-00942: table or view does not exist"
+    }
+  ]
+}
