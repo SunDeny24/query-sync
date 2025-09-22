@@ -3,6 +3,9 @@ import react from "react";
 function CardGrid({ list }) {
   // 쿼리리스트 카운팅 변수 선언
   const count = list.length;
+  // console.log(
+  //   `list : ${list} / id : ${list.id}/ status : ${list.status} / 타입 : ${typeof list.status}`,
+  // );
   const success = list.filter((v) => v.status === true).length;
   const fail = list.filter((v) => v.status === false).length;
   const unknown = count - success - fail; //알수없는 결과값
