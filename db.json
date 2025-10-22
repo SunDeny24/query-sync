@@ -1,29 +1,34 @@
 {
   "queryDefinitions": [
     {
-      "id": "Q001",
+      "id": "Q0001",
       "name": "판매전환 중복건검증",
       "query": "SELECT sale_id, COUNT(*) FROM sales GROUP BY sale_id HAVING COUNT(*) > 1;"
     },
     {
-      "id": "Q002",
+      "id": "Q0002",
       "name": "원영수증 누락건",
       "query": "SELECT * FROM receipts WHERE original_receipt_id IS NULL;"
     },
     {
-      "id": "Q003",
+      "id": "Q0003",
       "name": "판매전환의 예약취소건",
       "query": "SELECT * FROM sales WHERE status = 'CANCELLED' AND type = 'RESERVATION';"
     },
     {
       "id": "Q0004",
-      "name": "쿼리",
-      "query": "select * from happy"
+      "name": "쿼리이름테스트",
+      "query": "sql쿼리1"
+    },
+    {
+      "id": "Q0005",
+      "name": "쿼리이름테스트2",
+      "query": "sql쿼리2"
     }
   ],
   "queryResults": [
     {
-      "id": "Q001",
+      "id": "Q0001",
       "lastRun": "2025-09-08 10:30:15",
       "status": true,
       "resultData": [
@@ -39,7 +44,7 @@
       "error": null
     },
     {
-      "id": "Q002",
+      "id": "Q0002",
       "lastRun": "2025-09-08 10:30:15",
       "status": true,
       "resultData": [
@@ -57,11 +62,25 @@
       "error": null
     },
     {
-      "id": "Q003",
+      "id": "Q0003",
       "lastRun": "2025-09-08 10:30:15",
       "status": false,
       "resultData": [],
       "error": "ORA-00942: table or view does not exist"
+    },
+    {
+      "id": "Q0004",
+      "lastRun": "2025-10-22 09:23:27",
+      "status": null,
+      "resultData": [],
+      "error": null
+    },
+    {
+      "id": "Q0005",
+      "lastRun": "2025-10-22 09:27:40",
+      "status": null,
+      "resultData": [],
+      "error": null
     }
   ]
 }

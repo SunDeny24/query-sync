@@ -6,7 +6,8 @@ import Dashboard from "./pages/Dashboard.jsx";
 import AddQuery from "./pages/AddQuery.jsx";
 
 function App() {
-  const [queryList, setQueryList] = useState([]);
+  const [queryList, setQueryList] = useState([]); //쿼리리스트
+  const [queries, setQueries] = useState([]); // 쿼리 이력
 
   const today = new Date().toISOString().slice(0, 19).replace("T", " "); //날짜
 
@@ -66,33 +67,43 @@ function App() {
   const handleAddQuery = async (newQueryData) => {
     try {
       const newId = generateNewId(queryList); //채번
-      //저장 데이터 가공
-      const addQueryList = {
+      console.log("queryList : ", queryList);
+
+      //1. 저장 객체(정의)
+      const addDefintionData = {
         id: newId,
         ...newQueryData,
       };
-      console.log("저장 전 데이터 : ", addQueryList);
-
-      //데이터 저장 및 반환
-      const response = await fetch("http://localhost:3001/queryDefinitions", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(addQueryList),
-      });
-      const result = await response.json();
-
-      //저장 후 결과(추후 DB 연결 후 수정)
-      const returnResult = {
+      //2. 저장 객체(결과)
+      const resultData = {
+        id: newId,
         lastRun: today,
         status: null,
         resultData: [],
         error: null,
       };
 
-      //결과 합치기 => queryList 업데이트위함
+      //1,2 객체 저장
+      const [defResponse, resResponse] = await Promise.all([
+        fetch("http://localhost:3001/queryDefinitions", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(addDefintionData),
+        }),
+        fetch("http://localhost:3001/queryResults", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(resultData),
+        }),
+      ]);
+
+      const saveDefResult = await defResponse.json();
+      const saveResResult = await resResponse.json();
+
+      //결과 합치기
       const newQuery = {
-        ...result,
-        ...returnResult,
+        ...saveResResult,
+        name: saveDefResult.name,
       };
       console.log(newQuery);
 

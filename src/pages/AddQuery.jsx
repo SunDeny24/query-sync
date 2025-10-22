@@ -3,13 +3,15 @@ import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 
 function AddQuery({ onAdd }) {
+  /* State 관리데이터(저장될데이터) */
   const [queryName, setQueryName] = useState("");
   const [sqlQuery, setSqlQuery] = useState("");
 
   const navigate = useNavigate(); //네비게이터 추가
 
+  //form 저장 이벤트
   const handleSubmit = (e) => {
-    e.preventDefault(); //submit 이벤트 막기
+    e.preventDefault();
 
     //유효성 검사
     if (!queryName.trim() || !sqlQuery.trim()) {
@@ -23,6 +25,7 @@ function AddQuery({ onAdd }) {
       query: sqlQuery,
     };
 
+    //생성된 객체 app의 handleAddQuery이벤트로 넘김
     onAdd(newQueryData);
     navigate("/"); //다시 대시보드로
   };
@@ -30,29 +33,29 @@ function AddQuery({ onAdd }) {
   return (
     <div className="p-6">
       <div className="mx-auto max-w-4xl rounded-lg border bg-white shadow">
-        {/* Header */}
-        <div className="flex items-center justify-between border-b px-4 py-3">
-          <h1 className="text-2xl font-bold">쿼리 정보</h1>
-          <div className="flex gap-2">
-            <button className="rounded bg-gray-200 px-3 py-1 text-gray-700 hover:bg-gray-300">
-              수정
-            </button>
-            <button
-              type="submit"
-              className="rounded bg-blue-500 px-4 py-1 font-bold text-white hover:bg-blue-700"
-            >
-              저장
-            </button>
-            <Link to="/">
-              <button className="rounded border border-blue-500 bg-transparent px-3 py-1 font-semibold text-blue-700 hover:bg-blue-500 hover:text-white">
-                닫기
+        <form onSubmit={handleSubmit} className="p-6">
+          {/* Header 버튼 */}
+          <div className="mb-6 flex items-center justify-between border-b px-4 py-3">
+            <h1 className="text-2xl font-bold">쿼리 정보</h1>
+            <div className="flex gap-2">
+              <button className="rounded bg-gray-200 px-3 py-1 text-gray-700 hover:bg-gray-300">
+                수정
               </button>
-            </Link>
+              <button
+                type="submit"
+                className="rounded bg-blue-500 px-4 py-1 font-bold text-white hover:bg-blue-700"
+              >
+                저장
+              </button>
+              <Link to="/">
+                <button className="rounded border border-blue-500 bg-transparent px-3 py-1 font-semibold text-blue-700 hover:bg-blue-500 hover:text-white">
+                  닫기
+                </button>
+              </Link>
+            </div>
           </div>
-        </div>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-6 p-6">
+          {/* Form부분 */}
           <div className="col-span-2 space-y-5">
             {/* Query ID */}
             <div className="flex items-center gap-3">
@@ -105,7 +108,7 @@ function AddQuery({ onAdd }) {
               />
             </div>
 
-            {/* Result */}
+            {/* 조회 결과 */}
             <div>
               <div className="mb-2 flex items-center justify-between">
                 <label className="font-medium">조회 결과</label>
@@ -124,7 +127,7 @@ function AddQuery({ onAdd }) {
               />
             </div>
 
-            {/* Condition */}
+            {/* 조건 */}
             <div>
               <label
                 htmlFor="condition"
