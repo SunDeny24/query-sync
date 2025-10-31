@@ -1,4 +1,5 @@
 import react from "react";
+import { Link } from "react-router-dom";
 
 function DataList({ list }) {
   return (
@@ -16,15 +17,15 @@ function DataList({ list }) {
             </tr>
           </thead>
           <tbody>
-            {list.map((list) => (
-              <tr key={list.id}>
-                <td>{list.id}</td>
-                <td>{list.name}</td>
-                <td>{list.lastRun}</td>
-                <td>{list.status === true ? "성공" : "실패"}</td>
+            {list.map((item) => (
+              <tr key={item.id}>
+                <td>{item.id}</td>
+                <td>{item.name}</td>
+                <td>{item.result.lastRun}</td>
+                <td>{item.result.status === true ? "성공" : "실패"}</td>
                 <td>
                   <button className="rounded-lg bg-amber-200 px-3 py-1 text-black transition-colors hover:bg-amber-400">
-                    보기
+                    <Link to={`/add/${item.id}`}>보기</Link>
                   </button>
                 </td>
                 <td>

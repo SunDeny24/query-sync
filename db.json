@@ -1,86 +1,163 @@
 {
-  "queryDefinitions": [
+  "queryMaster": [
     {
       "id": "Q0001",
       "name": "판매전환 중복건검증",
-      "query": "SELECT sale_id, COUNT(*) FROM sales GROUP BY sale_id HAVING COUNT(*) > 1;"
+      "query": "SELECT sale_id, COUNT(*) FROM sales GROUP BY sale_id HAVING COUNT(*) > 1;",
+      "createDt": "2025-10-01 10:00:00",
+      "lastModiDt": "2025-10-30 14:30:00",
+      "result": {
+        "lastRun": "2025-09-08 10:30:15",
+        "status": true,
+        "resultData": [
+          {
+            "sale_id": "S1024",
+            "COUNT(*)": 2
+          },
+          {
+            "sale_id": "S1055",
+            "COUNT(*)": 3
+          }
+        ],
+        "error": null
+      }
     },
     {
       "id": "Q0002",
       "name": "원영수증 누락건",
-      "query": "SELECT * FROM receipts WHERE original_receipt_id IS NULL;"
+      "query": "SELECT * FROM receipts WHERE original_receipt_id IS NULL;",
+      "createDt": "2025-10-02 11:00:00",
+      "lastModiDt": "2025-10-29 11:15:00",
+      "result": {
+        "lastRun": "2025-09-08 10:30:15",
+        "status": true,
+        "resultData": [
+          {
+            "receipt_id": "R9001",
+            "amount": 50000,
+            "original_receipt_id": null
+          },
+          {
+            "receipt_id": "R9002",
+            "amount": 12000,
+            "original_receipt_id": null
+          }
+        ],
+        "error": null
+      }
     },
     {
       "id": "Q0003",
       "name": "판매전환의 예약취소건",
-      "query": "SELECT * FROM sales WHERE status = 'CANCELLED' AND type = 'RESERVATION';"
+      "query": "SELECT * FROM sales WHERE status = 'CANCELLED' AND type = 'RESERVATION';",
+      "createDt": "2025-10-03 12:00:00",
+      "lastModiDt": "2025-10-28 16:45:00",
+      "result": {
+        "lastRun": "2025-09-08 10:30:15",
+        "status": false,
+        "resultData": [],
+        "error": "ORA-00942: table or view does not exist"
+      }
     },
     {
       "id": "Q0004",
       "name": "쿼리이름테스트",
-      "query": "sql쿼리1"
+      "query": "sql쿼리1",
+      "createDt": "2025-10-04 13:00:00",
+      "lastModiDt": "2025-10-27 17:00:00",
+      "result": {
+        "lastRun": "2025-10-22 09:23:27",
+        "status": null,
+        "resultData": [],
+        "error": null
+      }
     },
     {
       "id": "Q0005",
-      "name": "쿼리이름테스트2",
-      "query": "sql쿼리2"
-    }
-  ],
-  "queryResults": [
-    {
-      "id": "Q0001",
-      "lastRun": "2025-09-08 10:30:15",
-      "status": true,
-      "resultData": [
-        {
-          "sale_id": "S1024",
-          "COUNT(*)": 2
-        },
-        {
-          "sale_id": "S1055",
-          "COUNT(*)": 3
-        }
-      ],
-      "error": null
+      "name": "쿼리이름테스트5",
+      "query": "sql쿼리5 수정함",
+      "createDt": "2025-10-05 14:00:00",
+      "lastModiDt": "2025-10-31 17:35:00",
+      "result": {
+        "lastRun": "2025-10-31 18:09:00",
+        "status": null,
+        "resultData": [],
+        "error": null
+      }
     },
     {
-      "id": "Q0002",
-      "lastRun": "2025-09-08 10:30:15",
-      "status": true,
-      "resultData": [
-        {
-          "receipt_id": "R9001",
-          "amount": 50000,
-          "original_receipt_id": null
-        },
-        {
-          "receipt_id": "R9002",
-          "amount": 12000,
-          "original_receipt_id": null
-        }
-      ],
-      "error": null
+      "id": "Q0006",
+      "name": "구매전환 중복",
+      "query": "SELECT * FROM test table",
+      "createDt": "2025-10-06 15:00:00",
+      "lastModiDt": "2025-10-31 08:32:00",
+      "result": {
+        "lastRun": "2025-10-31 08:32:32",
+        "status": null,
+        "resultData": [],
+        "error": null
+      }
     },
     {
-      "id": "Q0003",
-      "lastRun": "2025-09-08 10:30:15",
-      "status": false,
-      "resultData": [],
-      "error": "ORA-00942: table or view does not exist"
+      "id": "Q0007",
+      "name": "쿼리이름테스트",
+      "query": "sql쿼리11",
+      "createDt": "2025-10-07 16:00:00",
+      "lastModiDt": "2025-10-31 07:28:00",
+      "result": {
+        "lastRun": "2025-10-31 07:28:57",
+        "status": null,
+        "resultData": [],
+        "error": null
+      }
     },
     {
-      "id": "Q0004",
-      "lastRun": "2025-10-22 09:23:27",
-      "status": null,
-      "resultData": [],
-      "error": null
+      "id": "Q0008",
+      "name": "원영수증 누락건1",
+      "query": "SELECT * FROM receipts WHERE original_receipt_id IS NULL;",
+      "createDt": "2025-10-08 17:00:00",
+      "lastModiDt": "2025-10-31 07:44:00",
+      "result": {
+        "lastRun": "2025-10-31 07:44:53",
+        "status": null,
+        "resultData": [],
+        "error": null
+      }
     },
     {
-      "id": "Q0005",
-      "lastRun": "2025-10-22 09:27:40",
-      "status": null,
-      "resultData": [],
-      "error": null
+      "lastModiDt": "2025-10-31 22:54:21",
+      "name": "새로운 쿼리추가",
+      "query": "select * from newTable",
+      "result": {
+        "status": null,
+        "resultData": [],
+        "error": null
+      },
+      "id": "Q0009"
+    },
+    {
+      "lastModiDt": "2025-10-31 22:55:50",
+      "name": "new query 입니다.",
+      "query": "select * from happy",
+      "createDt": "2025-10-31 22:54:28",
+      "result": {
+        "status": null,
+        "resultData": [],
+        "error": null
+      },
+      "id": "Q0010"
+    },
+    {
+      "lastModiDt": "2025-10-31 23:03:17",
+      "id": "Q0011",
+      "name": "쿼리이름1",
+      "query": "select * from star",
+      "createDt": "2025-10-31 23:03:03",
+      "result": {
+        "status": null,
+        "resultData": [],
+        "error": null
+      }
     }
   ]
 }

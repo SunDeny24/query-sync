@@ -2,44 +2,40 @@ import { useEffect, useState } from "react";
 import { Routes, Route } from "react-router-dom";
 import "./App.css";
 import Dashboard from "./pages/Dashboard.jsx";
-//import { fakeQueryData } from "./data/mockData.js"; 삭제
 import AddQuery from "./pages/AddQuery.jsx";
 
 function App() {
   const [queryList, setQueryList] = useState([]); //쿼리리스트
   const [queries, setQueries] = useState([]); // 쿼리 이력
 
-  const today = new Date().toISOString().slice(0, 19).replace("T", " "); //날짜
+  //현재시각
+  const now = new Date();
+  const today =
+    now.getFullYear() +
+    "-" +
+    String(now.getMonth() + 1).padStart(2, "0") +
+    "-" +
+    String(now.getDate()).padStart(2, "0") +
+    " " +
+    String(now.getHours()).padStart(2, "0") +
+    ":" +
+    String(now.getMinutes()).padStart(2, "0") +
+    ":" +
+    String(now.getSeconds()).padStart(2, "0");
+  console.log("today:", today);
 
-  //쿼리리스트 데이터 api 비동기 통신으로 받기
+  //쿼리리스트 데이터 조회
   useEffect(() => {
     const fetchData = async () => {
       try {
-        //resultRes : 원시데이터
-        //defRes : json 실행한 데이터
-        //queryResults : 실행될 데이터json
-        //queryDefinitions : 보여줄 리스트 데이터json
-        const [resultsRes, defsRes] = await Promise.all([
-          fetch("http://localhost:3001/queryResults"),
-          fetch("http://localhost:3001/queryDefinitions"),
-        ]);
+        const res = await fetch("http://localhost:3001/queryMaster");
 
         //통신된 데이터 받아오기
-        const results = await resultsRes.json();
-        const definitions = await defsRes.json();
+        const results = await res.json();
 
-        //데이터합치기 : 동일한 id값을 찾아서 queryResults에 queryDefinitions을 합쳐준다.
-        const mergeData = results.map((result) => {
-          const definition = definitions.find(
-            (definit) => result.id === definit.id,
-          );
-          return { ...result, name: definition ? definition.name : "이름없음" };
-        });
-
-        // 합쳐진 데이터로 state 업데이트
-        setQueryList(mergeData);
+        setQueryList(results);
       } catch (err) {
-        console.error("에러발생 ", err);
+        console.error("리스트 조회시 에러발생 ", err);
       }
     };
 
@@ -64,52 +60,55 @@ function App() {
   };
 
   //AddQuery에서 쿼리리스트 추가하는 함수
-  const handleAddQuery = async (newQueryData) => {
+  const saveAddQuery = async (newQueryData) => {
     try {
       const newId = generateNewId(queryList); //채번
-      console.log("queryList : ", queryList);
 
-      //1. 저장 객체(정의)
-      const addDefintionData = {
+      const addData = {
         id: newId,
+        createDt: today,
+        lastModiDt: null,
         ...newQueryData,
       };
-      //2. 저장 객체(결과)
-      const resultData = {
-        id: newId,
-        lastRun: today,
-        status: null,
-        resultData: [],
-        error: null,
-      };
 
-      //1,2 객체 저장
-      const [defResponse, resResponse] = await Promise.all([
-        fetch("http://localhost:3001/queryDefinitions", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(addDefintionData),
-        }),
-        fetch("http://localhost:3001/queryResults", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(resultData),
-        }),
-      ]);
+      //새로운 쿼리 저장
+      const res = await fetch("http://localhost:3001/queryMaster", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(addData),
+      });
 
-      const saveDefResult = await defResponse.json();
-      const saveResResult = await resResponse.json();
+      const saveResult = await res.json();
+      console.log("saveResult : ", saveResult);
 
-      //결과 합치기
-      const newQuery = {
-        ...saveResResult,
-        name: saveDefResult.name,
-      };
-      console.log(newQuery);
-
-      setQueryList((prev) => [...prev, newQuery]);
+      setQueryList((prev) => [...prev, saveResult]);
     } catch (error) {
-      console.log("쿼리 저장시 handleAddQuery 에러 : ", error);
+      console.log("쿼리 저장시 saveAddQuery 에러 : ", error);
+    }
+  };
+
+  //상세보기시 데이터 수정하는 함수
+  const editAddQuery = async (editQueryData, id) => {
+    try {
+      const editData = {
+        lastModiDt: today,
+        ...editQueryData,
+      };
+
+      const res = await fetch(`http://localhost:3001/queryMaster/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(editData),
+      });
+
+      const editResult = await res.json();
+      console.log("editResult : ", editResult);
+
+      setQueryList((prev) =>
+        prev.map((item) => (item.id === editResult.id ? editResult : item)),
+      );
+    } catch (error) {
+      console.log("쿼리 수정시 editAddQuery 에러 : ", error);
     }
   };
 
@@ -117,7 +116,8 @@ function App() {
     <div>
       <Routes>
         <Route path="/" element={<Dashboard list={queryList} />} />
-        <Route path="/add" element={<AddQuery onAdd={handleAddQuery} />} />
+        <Route path="/add" element={<AddQuery onAdd={saveAddQuery} />} />
+        <Route path="/add/:id" element={<AddQuery onEdit={editAddQuery} />} />
       </Routes>
     </div>
   );
