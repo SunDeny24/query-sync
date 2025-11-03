@@ -13,7 +13,6 @@ function DataList({ list }) {
               <th className="p-2">실행시간</th>
               <th className="p-2">결과</th>
               <th className="p-2">상세보기</th>
-              <th className="p-2">조회</th>
             </tr>
           </thead>
           <tbody>
@@ -22,15 +21,16 @@ function DataList({ list }) {
                 <td>{item.id}</td>
                 <td>{item.name}</td>
                 <td>{item.result.lastRun}</td>
-                <td>{item.result.status === true ? "성공" : "실패"}</td>
+                <td>
+                  {item.result.status === true
+                    ? "성공"
+                    : item.result.status === false
+                      ? "실패"
+                      : ""}
+                </td>
                 <td>
                   <button className="rounded-lg bg-amber-200 px-3 py-1 text-black transition-colors hover:bg-amber-400">
                     <Link to={`/add/${item.id}`}>보기</Link>
-                  </button>
-                </td>
-                <td>
-                  <button className="rounded-lg border px-3 py-1 text-white transition-colors hover:bg-blue-100">
-                    🏃‍♂️‍➡️
                   </button>
                 </td>
               </tr>

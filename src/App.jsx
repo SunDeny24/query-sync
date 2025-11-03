@@ -67,7 +67,7 @@ function App() {
       const addData = {
         id: newId,
         createDt: today,
-        lastModiDt: null,
+        modiDt: null,
         ...newQueryData,
       };
 
@@ -91,7 +91,7 @@ function App() {
   const editAddQuery = async (editQueryData, id) => {
     try {
       const editData = {
-        lastModiDt: today,
+        modiDt: today,
         ...editQueryData,
       };
 
