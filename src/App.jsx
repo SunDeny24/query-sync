@@ -6,7 +6,6 @@ import AddQuery from "./pages/AddQuery.jsx";
 
 function App() {
   const [queryList, setQueryList] = useState([]); //쿼리리스트
-  const [queries, setQueries] = useState([]); // 쿼리 이력
 
   //현재시각
   const now = new Date();
@@ -22,7 +21,6 @@ function App() {
     String(now.getMinutes()).padStart(2, "0") +
     ":" +
     String(now.getSeconds()).padStart(2, "0");
-  console.log("today:", today);
 
   //쿼리리스트 데이터 조회
   useEffect(() => {
@@ -79,7 +77,6 @@ function App() {
       });
 
       const saveResult = await res.json();
-      console.log("saveResult : ", saveResult);
 
       setQueryList((prev) => [...prev, saveResult]);
     } catch (error) {
@@ -112,12 +109,47 @@ function App() {
     }
   };
 
+  //데이터 삭제기능
+  const deleteQuery = async (id) => {
+    try {
+      //console.log(id, " 삭제함");
+      const res = await fetch(`http://localhost:3001/queryMaster/${id}`, {
+        method: "DELETE",
+      });
+      if (!res.ok) {
+        throw new Error("서버에서 삭제를 실패하였습니다.");
+      }
+      setQueryList((prev) => prev.filter((item) => item.id !== id));
+    } catch (error) {
+      console.log("삭제시 deleteQuery 에러 : ", error);
+    }
+  };
+
+  //쿼리실행결과 리스트 반영하기
+  const updateQueryList = (id, newResult) => {
+    console.log("setQueryList 반영");
+    setQueryList((prev) =>
+      prev.map((item) =>
+        item.id === id ? { ...item, result: newResult } : item,
+      ),
+    );
+  };
+
   return (
     <div>
       <Routes>
         <Route path="/" element={<Dashboard list={queryList} />} />
         <Route path="/add" element={<AddQuery onAdd={saveAddQuery} />} />
-        <Route path="/add/:id" element={<AddQuery onEdit={editAddQuery} />} />
+        <Route
+          path="/add/:id"
+          element={
+            <AddQuery
+              onEdit={editAddQuery}
+              onDelete={deleteQuery}
+              onRunQuery={updateQueryList}
+            />
+          }
+        />
       </Routes>
     </div>
   );

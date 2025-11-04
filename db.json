@@ -1,13 +1,13 @@
 {
   "queryMaster": [
     {
-      "modiDt": "2025-11-01 17:49:31",
+      "modiDt": "2025-11-04 12:15:07",
       "id": "Q0001",
       "name": "판매영수증 중복건 검증",
       "query": "SELECT sale_id, COUNT(*) FROM sales GROUP BY sale_id HAVING COUNT(*) > 1;",
-      "createDt": "2025-10-01 10:00:00",
+      "createDt": "2025-09-01 13:00:00",
       "result": {
-        "lastRun": "2025-09-08 10:30:15",
+        "lastRun": "2025-11-04 12:15:09",
         "status": true,
         "resultData": [
           {
@@ -19,7 +19,7 @@
             "COUNT(*)": 3
           }
         ],
-        "error": null
+        "executionTime": 1200
       },
       "condition": {
         "type": "cond1",
@@ -28,158 +28,154 @@
       }
     },
     {
+      "modiDt": "2025-11-04 16:15:00",
       "id": "Q0002",
-      "name": "원영수증 누락건",
-      "query": "SELECT * FROM receipts WHERE original_receipt_id IS NULL;",
-      "createDt": "2025-10-02 11:00:00",
-      "modiDt": "2025-10-29 11:15:00",
+      "name": "원영수증 없는 반품건",
+      "query": "SELECT receipt_id, status FROM returns WHERE original_receipt_id IS NULL AND status = 'COMPLETED';",
+      "createDt": "2025-09-03 13:00:00",
       "result": {
-        "lastRun": "2025-09-08 10:30:15",
+        "lastRun": "2025-11-04 17:20:31",
+        "status": true,
+        "resultData": [],
+        "executionTime": 3
+      },
+      "condition": {
+        "type": "cond1",
+        "operator": "=",
+        "value": 0
+      }
+    },
+    {
+      "modiDt": "2025-11-04 17:18:47",
+      "id": "Q0003",
+      "name": "판매금액-결제금액 불일치",
+      "query": "SELECT s.sale_id, s.total_amount, p.paid_amount FROM sales s JOIN payments p ON s.sale_id = p.sale_id WHERE s.total_amount != p.paid_amount;",
+      "createDt": "2025-09-01 13:00:00",
+      "result": {
+        "lastRun": "2025-11-04 17:16:12",
         "status": true,
         "resultData": [
           {
-            "receipt_id": "R9001",
-            "amount": 50000,
-            "original_receipt_id": null
-          },
-          {
-            "receipt_id": "R9002",
-            "amount": 12000,
-            "original_receipt_id": null
+            "sale_id": "S2001",
+            "total_amount": 10000,
+            "paid_amount": 9900
           }
         ],
-        "error": null
+        "error": "",
+        "executionTime": null
       },
       "condition": {
-        "type": "cond2",
-        "column": "original_receipt_id",
-        "value": "false"
+        "type": "cond1",
+        "operator": ">",
+        "value": 0
       }
     },
     {
-      "id": "Q0003",
-      "name": "판매전환의 예약취소건",
-      "query": "SELECT * FROM sales WHERE status = 'CANCELLED' AND type = 'RESERVATION';",
-      "createDt": "2025-10-03 12:00:00",
-      "modiDt": "2025-10-28 16:45:00",
+      "modiDt": "2025-11-04 20:51:06",
+      "id": "Q0004",
+      "name": "카드 승인번호 자릿수 누락",
+      "query": "SELECT payment_id, card_approval_no FROM card_payments WHERE payment_type = 'CREDIT' AND LENGTH(card_approval_no) < 6;",
+      "createDt": "2025-11-02 16:00:00",
       "result": {
-        "lastRun": "2025-09-08 10:30:15",
+        "lastRun": "2025-11-04 20:51:17",
         "status": false,
         "resultData": [],
-        "error": "ORA-00942: table or view does not exist"
+        "error": null,
+        "executionTime": 3
+      },
+      "condition": {
+        "type": "cond1",
+        "operator": "=",
+        "value": 1
+      }
+    },
+    {
+      "modiDt": "2025-11-04 17:18:54",
+      "id": "Q0005",
+      "name": "일일 매출 리포트 성능",
+      "query": "SELECT store_code, SUM(total_sales) as daily_total FROM daily_sales_summary WHERE sale_date = TRUNC(SYSDATE) GROUP BY store_code;",
+      "createDt": "2025-11-01 13:00:00",
+      "result": {
+        "lastRun": "2025-11-04 17:19:48",
+        "status": true,
+        "resultData": [
+          {
+            "store_code": "ST001",
+            "daily_total": 15000000
+          },
+          {
+            "store_code": "ST002",
+            "daily_total": 12500000
+          }
+        ],
+        "error": "",
+        "executionTime": 3
       },
       "condition": {
         "type": "cond3",
-        "time": "3000"
+        "time": 5000
       }
     },
     {
-      "id": "Q0004",
-      "name": "쿼리이름테스트",
-      "query": "sql쿼리1",
-      "createDt": "2025-10-04 13:00:00",
-      "modiDt": "2025-10-27 17:00:00",
-      "result": {
-        "lastRun": "2025-10-22 09:23:27",
-        "status": null,
-        "resultData": [],
-        "error": null
-      },
-      "condition": null
-    },
-    {
-      "id": "Q0005",
-      "name": "쿼리이름테스트5",
-      "query": "sql쿼리5 수정함",
-      "createDt": "2025-10-05 14:00:00",
-      "modiDt": "2025-10-31 17:35:00",
-      "result": {
-        "lastRun": "2025-10-31 18:09:00",
-        "status": null,
-        "resultData": [],
-        "error": null
-      },
-      "condition": null
-    },
-    {
+      "modiDt": "2025-11-04 16:26:51",
       "id": "Q0006",
-      "name": "구매전환 중복",
-      "query": "SELECT * FROM test table",
-      "createDt": "2025-10-06 15:00:00",
-      "modiDt": "2025-10-31 08:32:00",
+      "name": "야간 배치 실패 검증",
+      "query": "SELECT job_name, status FROM batch_logs WHERE job_name = 'DAILY_JAVA_BATCH' AND status = 'FAILED' AND run_date = TRUNC(SYSDATE);",
+      "createDt": "2025-11-03 13:00:00",
       "result": {
-        "lastRun": "2025-10-31 08:32:32",
-        "status": null,
-        "resultData": [],
-        "error": null
+        "lastRun": "2025-11-04 17:20:12",
+        "status": false,
+        "resultData": [
+          {
+            "job_name": "DAILY_JAVA_BATCH",
+            "status": "FAILED"
+          }
+        ],
+        "executionTime": 4
       },
-      "condition": null
+      "condition": {
+        "type": "cond1",
+        "operator": "=",
+        "value": 0
+      }
     },
     {
-      "modiDt": "2025-11-03 23:38:36",
       "id": "Q0007",
-      "name": "쿼리이름테스트ㅇ",
-      "query": "sql쿼리112ㅇ",
-      "createDt": "2025-10-07 16:00:00",
+      "createDt": "2025-11-04 18:07:50",
+      "modiDt": null,
+      "name": "AS 매장 미확정건",
+      "query": "SELECT as_receipt_id, customer_name, status FROM as_requests WHERE status IS NULL AND request_date > SYSDATE - 3;",
       "result": {
-        "lastRun": "2025-10-31 07:28:57",
-        "status": null,
+        "lastRun": "2025-11-04 20:50:29",
+        "status": true,
         "resultData": [],
-        "error": null
+        "error": null,
+        "executionTime": 4
       },
-      "condition": null
+      "condition": {
+        "type": "cond1",
+        "operator": "=",
+        "value": 0
+      }
     },
     {
       "id": "Q0008",
-      "name": "원영수증 누락건1",
-      "query": "SELECT * FROM receipts WHERE original_receipt_id IS NULL;",
-      "createDt": "2025-10-08 17:00:00",
-      "modiDt": "2025-10-31 07:44:00",
+      "createDt": "2025-11-04 20:51:20",
+      "modiDt": null,
+      "name": "테스트 데이터 추가",
+      "query": "select * from play",
       "result": {
-        "lastRun": "2025-10-31 07:44:53",
-        "status": null,
+        "lastRun": "2025-11-04 20:54:09",
+        "status": true,
         "resultData": [],
-        "error": null
+        "error": null,
+        "executionTime": 3
       },
-      "condition": null
-    },
-    {
-      "modiDt": "2025-10-31 22:54:21",
-      "name": "새로운 쿼리추가",
-      "query": "select * from newTable",
-      "result": {
-        "status": null,
-        "resultData": [],
-        "error": null
-      },
-      "id": "Q0009",
-      "condition": null
-    },
-    {
-      "modiDt": "2025-10-31 22:55:50",
-      "name": "new query 입니다.",
-      "query": "select * from happy",
-      "createDt": "2025-10-31 22:54:28",
-      "result": {
-        "status": null,
-        "resultData": [],
-        "error": null
-      },
-      "id": "Q0010",
-      "condition": null
-    },
-    {
-      "modiDt": "2025-10-31 23:03:17",
-      "id": "Q0011",
-      "name": "쿼리이름1",
-      "query": "select * from star",
-      "createDt": "2025-10-31 23:03:03",
-      "result": {
-        "status": null,
-        "resultData": [],
-        "error": null
-      },
-      "condition": null
+      "condition": {
+        "type": "cond1",
+        "operator": "=",
+        "value": 0
+      }
     }
   ]
 }
