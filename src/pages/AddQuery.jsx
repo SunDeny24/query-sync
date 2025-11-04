@@ -3,6 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 
 function AddQuery({ onAdd, onEdit, onDelete, onRunQuery }) {
+  const apiUrl = import.meta.env.VITE_API_URL;
   /*------------- State 관리데이터(저장될데이터)--------- */
   const [queryId, setQueryId] = useState(""); /* 쿼리ID */
   const [queryName, setQueryName] = useState(""); /* 쿼리이름 */
@@ -61,7 +62,7 @@ function AddQuery({ onAdd, onEdit, onDelete, onRunQuery }) {
     const fetchData = async () => {
       console.log(id, "의 수정모드");
       try {
-        const res = await fetch(`http://localhost:3001/queryMaster/${id}`);
+        const res = await fetch(`${apiUrl}/queryMaster/${id}`);
         if (!res.ok) {
           throw new Error("데이터 불러오는데 실패했습니다.");
         }
@@ -251,7 +252,7 @@ function AddQuery({ onAdd, onEdit, onDelete, onRunQuery }) {
     const runResultData = async () => {
       const startTime = performance.now(); //요청시작
       try {
-        const res = await fetch(`http://localhost:3001/queryMaster/${id}`);
+        const res = await fetch(`${apiUrl}/queryMaster/${id}`);
         if (!res.ok) {
           throw new Error("데이터 불러오는데 실패했습니다.");
         }
@@ -358,16 +359,13 @@ function AddQuery({ onAdd, onEdit, onDelete, onRunQuery }) {
         };
 
         //실행된 결과 PATCH
-        const updateRes = await fetch(
-          `http://localhost:3001/queryMaster/${id}`,
-          {
-            method: "PATCH",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              result: newResult, // result 객체만 갱신
-            }),
-          },
-        );
+        const updateRes = await fetch(`${apiUrl}/queryMaster/${id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            result: newResult, // result 객체만 갱신
+          }),
+        });
         if (!updateRes.ok) {
           throw new Error("결과를 db.json에 저장하는데 실패했습니다.");
         }
@@ -391,14 +389,11 @@ function AddQuery({ onAdd, onEdit, onDelete, onRunQuery }) {
         };
         //쿼리실행시 오류 update
         try {
-          const errUpdateRes = await fetch(
-            `http://localhost:3001/queryMaster/${id}`,
-            {
-              method: "PATCH",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ result: errResult }),
-            },
-          );
+          const errUpdateRes = await fetch(`${apiUrl}/queryMaster/${id}`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ result: errResult }),
+          });
           if (!errUpdateRes.ok) {
             throw new Error("에러정보를 DB에 저장하는데 실패하였습니다.");
           }

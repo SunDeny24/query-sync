@@ -165,7 +165,7 @@
       "name": "테스트 데이터 추가",
       "query": "select * from play",
       "result": {
-        "lastRun": "2025-11-04 20:54:09",
+        "lastRun": "2025-11-04 21:12:25",
         "status": true,
         "resultData": [],
         "error": null,

@@ -5,6 +5,7 @@ import Dashboard from "./pages/Dashboard.jsx";
 import AddQuery from "./pages/AddQuery.jsx";
 
 function App() {
+  const apiUrl = import.meta.env.VITE_API_URL;
   const [queryList, setQueryList] = useState([]); //쿼리리스트
 
   //현재시각
@@ -26,7 +27,7 @@ function App() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await fetch("http://localhost:3001/queryMaster");
+        const res = await fetch(`${apiUrl}/queryMaster`);
 
         //통신된 데이터 받아오기
         const results = await res.json();
@@ -70,7 +71,7 @@ function App() {
       };
 
       //새로운 쿼리 저장
-      const res = await fetch("http://localhost:3001/queryMaster", {
+      const res = await fetch(`${apiUrl}/queryMaster`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(addData),
@@ -92,7 +93,7 @@ function App() {
         ...editQueryData,
       };
 
-      const res = await fetch(`http://localhost:3001/queryMaster/${id}`, {
+      const res = await fetch(`${apiUrl}/queryMaster/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(editData),
@@ -113,7 +114,7 @@ function App() {
   const deleteQuery = async (id) => {
     try {
       //console.log(id, " 삭제함");
-      const res = await fetch(`http://localhost:3001/queryMaster/${id}`, {
+      const res = await fetch(`${apiUrl}/queryMaster/${id}`, {
         method: "DELETE",
       });
       if (!res.ok) {

@@ -16,25 +16,26 @@ function DataList({ list }) {
             </tr>
           </thead>
           <tbody>
-            {list.map((item) => (
-              <tr key={item.id}>
-                <td>{item.id}</td>
-                <td>{item.name}</td>
-                <td>{item.result.lastRun}</td>
-                <td>
-                  {item.result.status === true
-                    ? "성공"
-                    : item.result.status === false
-                      ? "실패"
-                      : ""}
-                </td>
-                <td>
-                  <button className="rounded-lg bg-amber-200 px-3 py-1 text-black transition-colors hover:bg-amber-400">
-                    <Link to={`/add/${item.id}`}>보기</Link>
-                  </button>
-                </td>
-              </tr>
-            ))}
+            {list &&
+              list.map((item) => (
+                <tr key={item.id}>
+                  <td>{item.id}</td>
+                  <td>{item.name}</td>
+                  <td>{item.result?.lastRun || "-"}</td>
+                  <td>
+                    {item.result?.status === true
+                      ? "성공"
+                      : item.result?.status === false
+                        ? "실패"
+                        : ""}
+                  </td>
+                  <td>
+                    <button className="rounded-lg bg-amber-200 px-3 py-1 text-black transition-colors hover:bg-amber-400">
+                      <Link to={`/add/${item.id}`}>보기</Link>
+                    </button>
+                  </td>
+                </tr>
+              ))}
           </tbody>
         </table>
       </div>
