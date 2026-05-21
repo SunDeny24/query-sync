@@ -1,9 +1,12 @@
+// 쿼리추가, 쿼리상세, 쿼리수정 페이지 컴포넌트
+
 import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "../supabase"; // App.jsx와 동일 경로
 
 function AddQuery({ onAdd, onEdit, onDelete, onRunQuery }) {
-  const apiUrl = import.meta.env.VITE_API_URL;
   /*------------- State 관리데이터(저장될데이터)--------- */
   const [queryId, setQueryId] = useState(""); /* 쿼리ID */
   const [queryName, setQueryName] = useState(""); /* 쿼리이름 */
@@ -57,61 +60,66 @@ function AddQuery({ onAdd, onEdit, onDelete, onRunQuery }) {
     cond3: "조건 3",
   };
 
-  //수정(보기)모드일때 데이터조회
+  /**
+   * 수정(보기) 모드일때만 데이터 조회함
+   * */
+  const {
+    data: existingQuery,
+    isLoading: isQueryLoading,
+    isError: isQueryError,
+  } = useQuery({
+    queryKey: ["queryDetail", id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("queryMaster")
+        .select("*")
+        .eq("id", id)
+        .single();
+      if (error) throw error;
+      return data;
+    },
+    enabled: isEditMode,
+  });
+  // 조회된 데이터(existingQuery)가 들어오면 State에 뿌려줌
   useEffect(() => {
-    const fetchData = async () => {
-      console.log(id, "의 수정모드");
-      try {
-        const res = await fetch(`${apiUrl}/queryMaster/${id}`);
-        if (!res.ok) {
-          throw new Error("데이터 불러오는데 실패했습니다.");
-        }
-        //통신된 데이터 받아오기
-        const results = await res.json();
-        setOriginData(results); /* 원본데이터 */
-        setQueryId(results.id);
-        setQueryName(results.name);
-        setSqlQuery(results.query);
-        setcreateDt(results.createDt);
-        setModiDt(results.modiDt);
+    if (existingQuery) {
+      //통신된 데이터 받아오기
+      setOriginData(existingQuery); /* 원본데이터 */
+      setQueryId(existingQuery.id);
+      setQueryName(existingQuery.name);
+      setSqlQuery(existingQuery.query);
+      setcreateDt(existingQuery.createDt);
+      setModiDt(existingQuery.modiDt);
 
-        //result 데이터
-        if (results.result) {
-          setLastRun(results.result.lastRun || "");
-          setStatus(results.result.status);
-          setResultData(results.result.resultData || []);
-          setExecutionTime(results.result.executionTime || null);
-          setError(results.result.error || null);
-        }
-        //조건 데이터
-        if (results.condition) {
-          setCondType(results.condition.type);
-          switch (results.condition.type) {
-            case "cond1":
-              setCond1Oper(results.condition.operator || "=");
-              setCond1Val(results.condition.value || 0);
-              break;
-            case "cond2":
-              setCond2Col(results.condition.column || "");
-              setCond2Val(results.condition.value || "true");
-              break;
-            case "cond3":
-              setCond3Time(results.condition.time || 1000);
-              break;
-            default:
-              setCondType(null);
-          }
-        }
-      } catch (error) {
-        console.log("데이터로딩중 에러 : ", error);
+      //result 데이터
+      if (existingQuery.result) {
+        setLastRun(existingQuery.result.lastRun || "");
+        setStatus(existingQuery.result.status);
+        setResultData(existingQuery.result.resultData || []);
+        setExecutionTime(existingQuery.result.executionTime || null);
+        setError(existingQuery.result.error || null);
       }
-    };
-    if (!isEditMode) {
-      console.log("입력모드");
-    } else {
-      fetchData();
+      //조건 데이터
+      if (existingQuery.condition) {
+        setCondType(existingQuery.condition.type);
+        switch (existingQuery.condition.type) {
+          case "cond1":
+            setCond1Oper(existingQuery.condition.operator || "=");
+            setCond1Val(existingQuery.condition.value || 0);
+            break;
+          case "cond2":
+            setCond2Col(existingQuery.condition.column || "");
+            setCond2Val(existingQuery.condition.value || "true");
+            break;
+          case "cond3":
+            setCond3Time(existingQuery.condition.time || 1000);
+            break;
+          default:
+            setCondType(null);
+        }
+      }
     }
-  }, [id, isEditMode]);
+  }, [existingQuery]);
 
   /* 변경감지 함수 */
   const isDirty = () => {
@@ -149,7 +157,9 @@ function AddQuery({ onAdd, onEdit, onDelete, onRunQuery }) {
 
     return dirtyArr;
   };
-  /* form 저장 이벤트 */
+  /**
+   *  form 저장 이벤트
+   *  */
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -218,10 +228,12 @@ function AddQuery({ onAdd, onEdit, onDelete, onRunQuery }) {
       };
       onEdit(editQueryData, id); //id 구분위함
     }
-    navigate("/"); //다시 대시보드로
+    navigate("/"); //수정 완료시 대시보드로 이동
   };
 
-  /* 연산자 변환함수 */
+  /**
+   *  연산자 변환함수
+   *  */
   const operations = (a, b, operator) => {
     switch (operator) {
       case "=":
@@ -240,8 +252,11 @@ function AddQuery({ onAdd, onEdit, onDelete, onRunQuery }) {
     }
   };
 
-  /* 쿼리 실행시 이벤트 */
-  const runQuery = (e) => {
+  /**
+   *  쿼리 실행시 이벤트
+   *
+   *  */
+  const runQuery = async () => {
     const changedData = isDirty();
     if (changedData.length > 0) {
       alert(
@@ -249,166 +264,156 @@ function AddQuery({ onAdd, onEdit, onDelete, onRunQuery }) {
       );
       return;
     }
-    const runResultData = async () => {
-      const startTime = performance.now(); //요청시작
-      try {
-        const res = await fetch(`${apiUrl}/queryMaster/${id}`);
-        if (!res.ok) {
-          throw new Error("데이터 불러오는데 실패했습니다.");
-        }
-        const results = await res.json();
-        const endTime = performance.now(); //요청종료
-        const duration = Math.round(endTime - startTime); //서버실행시간
-        const condResult = results.condition;
-        let newStatus = false; //데이터없을시를 위한 플래그
+    const startTime = performance.now(); //요청시작
+    try {
+      const { data: results, error: fetchError } = await supabase
+        .from("queryMaster")
+        .select("*")
+        .eq("id", id)
+        .single();
 
-        //조건&결과 비교로직
-        if (condResult && condResult.type) {
-          switch (condResult.type) {
-            case "cond1":
-              const resultDataCond1 = results.result.resultData; //조건1의 조회결과
-              const operator = results.condition.operator; //조건1의 연산자
-              const value1 = results.condition.value; //조건1의 갯수값
+      if (fetchError) throw new Error("데이터 불러오는데 실패했습니다.");
 
-              // 조회결과의 행갯수 + 연산자 + 갯수값 >> 비교해서 맞으면 true or false
-              const condition1Result = operations(
-                Number(resultDataCond1.length),
-                Number(value1),
-                operator,
-              );
+      const endTime = performance.now(); //요청종료
+      const duration = Math.round(endTime - startTime); //서버실행시간
+      const condResult = results.condition;
+      let newStatus = false; //데이터없을시를 위한 플래그
 
-              newStatus = condition1Result; //변경된 상태값
+      //조건&결과 비교로직
+      if (condResult && condResult.type) {
+        switch (condResult.type) {
+          case "cond1":{
+            const resultDataCond1 = results.result.resultData; //조건1의 조회결과
+            const operator = results.condition.operator; //조건1의 연산자
+            const value1 = results.condition.value; //조건1의 갯수값
+
+            // 조회결과의 행갯수 + 연산자 + 갯수값 >> 비교해서 맞으면 true or false
+            const condition1Result = operations(
+              Number(resultDataCond1.length),
+              Number(value1),
+              operator,
+            );
+
+            newStatus = condition1Result; //변경된 상태값
+            console.log(
+              `Cond1: (조회결과: ${Number(resultDataCond1.length)}, 연산자: ${operator}, 행갯수 : ${value1}) = ${condition1Result}`,
+            );
+            break;
+}
+          case "cond2":{
+            const column = results.condition.column; // 조건2의 컬럼명
+            const expectedValStr = results.condition.value; // "true" 또는 "false"
+            const data = results.result.resultData; //조회결과값
+            let condition2Result = false; // 기본값 '실패'
+
+            // 데이터가 있고, 첫 번째 행에 해당 컬럼이 존재하는지 확인
+            if (
+              data &&
+              data.length > 0 &&
+              data[0] !== undefined &&
+              data[0].hasOwn(column)
+            ) {
+              const actualValue = data[0][column]; // 컬럼의 실제 값
+
+              //실제 값 boolean으로 변환
+              const actualBool =
+                String(actualValue).toLowerCase() === "true" ||
+                actualValue === true;
+
+              //기대 값 boolean으로 변환
+              const expectedBool = expectedValStr === "true";
+              //실제 값과 기대값 비교
+              condition2Result = actualBool === expectedBool;
+
               console.log(
-                `Cond1: (조회결과: ${Number(resultDataCond1.length)}, 연산자: ${operator}, 행갯수 : ${value1}) = ${condition1Result}`,
+                `Cond2: (Actual: ${actualBool}, Expected: ${expectedBool}) = ${condition2Result}`,
               );
-              break;
+            } else {
+              console.log("Cond2 Fail: No data or column not found.");
+              condition2Result = false; // 데이터가 없거나 컬럼이 없으면 무조건 실패
+            }
 
-            case "cond2":
-              const column = results.condition.column; // 조건2의 컬럼명
-              const expectedValStr = results.condition.value; // "true" 또는 "false"
-              const data = results.result.resultData; //조회결과값
-              let condition2Result = false; // 기본값 '실패'
+            newStatus = condition2Result; //변경된 상태값
+            break;
+}
+          case "cond3":{
+            const maxTime = Number(results.condition.time); // 허용 최대 시간
+            const actualTime = duration; // 실제 실행 시간
+            let condition3Result = false; // 기본값 '실패'
 
-              // 데이터가 있고, 첫 번째 행에 해당 컬럼이 존재하는지 확인
-              if (
-                data &&
-                data.length > 0 &&
-                data[0] !== undefined &&
-                data[0].hasOwnProperty(column)
-              ) {
-                const actualValue = data[0][column]; // 컬럼의 실제 값
+            // 실제시간이 있는 경우 비교해서 true or false
+            if (actualTime !== undefined && actualTime !== null) {
+              condition3Result = Number(actualTime) <= maxTime;
+              console.log(
+                `Cond3: (Actual: ${actualTime}ms, Max: ${maxTime}ms) = ${condition3Result}`,
+              );
+            } else {
+              console.log(
+                "Cond3 Fail: 'executionTime' not provided in server response.",
+              );
+              condition3Result = false; // 실행 시간이 없으면 무조건 실패
+            }
 
-                //실제 값 boolean으로 변환
-                const actualBool =
-                  String(actualValue).toLowerCase() === "true" ||
-                  actualValue === true;
-
-                //기대 값 boolean으로 변환
-                const expectedBool = expectedValStr === "true";
-                //실제 값과 기대값 비교
-                condition2Result = actualBool === expectedBool;
-
-                console.log(
-                  `Cond2: (Actual: ${actualBool}, Expected: ${expectedBool}) = ${condition2Result}`,
-                );
-              } else {
-                console.log("Cond2 Fail: No data or column not found.");
-                condition2Result = false; // 데이터가 없거나 컬럼이 없으면 무조건 실패
-              }
-
-              newStatus = condition2Result; //변경된 상태값
-              break;
-
-            case "cond3":
-              const maxTime = Number(results.condition.time); // 허용 최대 시간
-              const actualTime = duration; // 실제 실행 시간
-              let condition3Result = false; // 기본값 '실패'
-
-              // 실제시간이 있는 경우 비교해서 true or false
-              if (actualTime !== undefined && actualTime !== null) {
-                condition3Result = Number(actualTime) <= maxTime;
-                console.log(
-                  `Cond3: (Actual: ${actualTime}ms, Max: ${maxTime}ms) = ${condition3Result}`,
-                );
-              } else {
-                console.log(
-                  "Cond3 Fail: 'executionTime' not provided in server response.",
-                );
-                condition3Result = false; // 실행 시간이 없으면 무조건 실패
-              }
-
-              newStatus = condition3Result; //변경된 상태값
-              break;
-
-            default:
-              // condResult.type은 있지만 case에 해당 안되는 경우
-              conditionFlag = false;
-          }
-        } else {
-          // 특수조건이 아닌경우에 처리
-          newStatus = results.result.status; // 조건 없으면 기존 상태 유지
+            newStatus = condition3Result; //변경된 상태값
+            break;
+}
+          default:
+            // condResult.type은 있지만 case에 해당 안되는 경우
+            newStatus = false;
         }
-
-        //실행시킨 정보 UDPATE할 내용
-        const newResult = {
-          ...results.result,
-          lastRun: today,
-          status: newStatus,
-          executionTime: duration,
-          error: null,
-        };
-
-        //실행된 결과 PATCH
-        const updateRes = await fetch(`${apiUrl}/queryMaster/${id}`, {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            result: newResult, // result 객체만 갱신
-          }),
-        });
-        if (!updateRes.ok) {
-          throw new Error("결과를 db.json에 저장하는데 실패했습니다.");
-        }
-        console.log("id : ", id, "newResult:", newResult);
-        setStatus(newStatus);
-        setLastRun(today);
-        setExecutionTime(duration);
-        setResultData(results.result.resultData || []);
-        setError(null);
-        onRunQuery(id, newResult); //app에 patch된 내용 전달
-      } catch (error) {
-        console.log("쿼리실행중 에러 :", error);
-        const errMsg = error.message;
-        const errResult = {
-          ...(orginData.result || {}),
-          lastRun: today,
-          status: false,
-          resultData: [],
-          error: errMsg,
-          executionTime: Math.round(performance.now() - startTime),
-        };
-        //쿼리실행시 오류 update
-        try {
-          const errUpdateRes = await fetch(`${apiUrl}/queryMaster/${id}`, {
-            method: "PATCH",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ result: errResult }),
-          });
-          if (!errUpdateRes.ok) {
-            throw new Error("에러정보를 DB에 저장하는데 실패하였습니다.");
-          }
-        } catch (dbError) {
-          console.log(dbError.message);
-        }
-
-        setStatus(false); // 에러시 실패로
-        setResultData([]);
-        setLastRun(today);
-        setError(errMsg);
+      } else {
+        // 특수조건이 아닌경우
+       // newStatus = results.result.status; // 조건 없으면 기존 상태 유지
+        newStatus = true; //조건없이 쿼리실행으로도 성공 처리
       }
-    };
-    runResultData();
+
+      //실행시킨 정보 UDPATE할 내용
+      const newResult = {
+        ...results.result,
+        lastRun: today,
+        status: newStatus,
+        executionTime: duration,
+        error: null,
+      };
+      // App.jsx에서 내려준 onRunQuery 호출 (DB Patch 후 상태갱신)
+      onRunQuery(id, newResult);
+
+      // 화면 즉시 반영
+      setStatus(newStatus);
+      setLastRun(today);
+      setExecutionTime(duration);
+      setResultData(results.result.resultData || []);
+      setError(null);
+    } catch (error) {
+      console.log("쿼리실행중 에러 :", error);
+      const errMsg = error.message;
+      const errResult = {
+        ...(orginData?.result || {}),
+        lastRun: today,
+        status: false,
+        resultData: [],
+        error: errMsg,
+        executionTime: Math.round(performance.now() - startTime),
+      };
+      //쿼리실행시 오류 update
+      onRunQuery(id, errResult);
+
+      setStatus(false); // 에러시 실패로
+      setResultData([]);
+      setLastRun(today);
+      setError(errMsg);
+    }
   };
+
+  // 렌더링 중 로딩/에러 처리
+  if (isQueryLoading)
+    return <div className="p-6 text-center">데이터를 불러오는 중입니다...</div>;
+  if (isQueryError)
+    return (
+      <div className="p-6 text-center text-red-500">
+        데이터를 불러오는데 실패했습니다.
+      </div>
+    );
 
   return (
     <div className="p-6">
