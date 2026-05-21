@@ -1,4 +1,5 @@
-import react from "react";
+// 검증결과 표 안에 데이터 리스트 컴포넌트
+
 import { Link } from "react-router-dom";
 
 function DataList({ list }) {

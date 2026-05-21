@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "../supabase"; // App.jsx와 동일 경로
+import { supabase } from "../supabase";
 
 function AddQuery({ onAdd, onEdit, onDelete, onRunQuery }) {
   /*------------- State 관리데이터(저장될데이터)--------- */
@@ -121,7 +121,10 @@ function AddQuery({ onAdd, onEdit, onDelete, onRunQuery }) {
     }
   }, [existingQuery]);
 
-  /* 변경감지 함수 */
+  /**
+   * 변경감지 함수
+   * - 변경된 데이터 감지해서 변경된 폼체크된 배열 반환
+   * */
   const isDirty = () => {
     if (!isEditMode || !orginData) {
       // 신규거나 원본없으면 변경되지않은 상태
@@ -157,6 +160,7 @@ function AddQuery({ onAdd, onEdit, onDelete, onRunQuery }) {
 
     return dirtyArr;
   };
+
   /**
    *  form 저장 이벤트
    *  */

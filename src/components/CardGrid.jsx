@@ -1,4 +1,4 @@
-import react from "react";
+//대시보드 카드 컴포넌트
 
 function CardGrid({ list }) {
   // 쿼리리스트 카운팅 변수 선언

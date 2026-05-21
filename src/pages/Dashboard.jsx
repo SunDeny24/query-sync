@@ -1,4 +1,6 @@
-import react from "react";
+// 대시보드 페이지 컴포넌트
+
+
 import {Link} from "react-router-dom";
 import CardGrid from "../components/CardGrid.jsx";
 import DataList from "../components/DataList.jsx";
