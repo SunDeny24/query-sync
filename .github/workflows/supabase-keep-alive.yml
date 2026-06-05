@@ -1,0 +1,14 @@
+name: supabase-keep-alive
+on:
+  schedule:
+  # 💡 3일마다 한 번씩 한국 시간(KST) 새벽 4:00에 실행되도록 설정 (UTC 19:00)
+  - cron: '0 19 */3 * *'
+  workflow_dispatch: # GitHub 대시보드 수동 실행버튼 활성화
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Ping to Supabase
+        run: |
+          curl -i -X GET "${{ secrets.SUPABASE_URL }}/rest/v1/" \
+          -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}"
