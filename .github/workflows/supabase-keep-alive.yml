@@ -1,22 +1,27 @@
 name: supabase-keep-alive
+
 on:
   schedule:
-    # 매일 한국 시간(KST) 새벽 4:00에 실행되도록 설정 (UTC 19:00)
+    # 매일 한국 시간(KST) 새벽 4:00 (UTC 19:00)
     - cron: "0 19 * * *"
-  workflow_dispatch: # GitHub 대시보드 수동 활성화-update
+  workflow_dispatch:
+
 jobs:
   ping:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Update heartbeat
+      - name: Update heartbeat
         run: |
+          # 현재 UTC 시간을 생성
           NOW=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 
+          # PATCH 요청을 보내고 HTTP 상태 코드를 저장
           HTTP_CODE=$(curl \
             --fail \
             --show-error \
             --silent \
+            --output /dev/null \
             --write-out "%{http_code}" \
             -X PATCH \
             "${{ secrets.SUPABASE_URL }}/rest/v1/heartbeat?id=eq.1" \
@@ -25,4 +30,5 @@ jobs:
             -H "Content-Type: application/json" \
             -d "{\"updated_at\":\"$NOW\"}")
 
+          # HTTP 상태 코드 출력
           echo "HTTP Status: $HTTP_CODE"
