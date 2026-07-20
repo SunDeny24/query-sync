@@ -20,4 +20,4 @@ jobs:
             -H "Content-Type: application/json" \
             -d "{\"updated_at\":\"$NOW\"}"
 
-echo "HTTP Status: $HTTP_CODE"
+            echo "HTTP Status: $HTTP_CODE"
