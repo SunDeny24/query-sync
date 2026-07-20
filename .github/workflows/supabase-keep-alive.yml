@@ -9,15 +9,20 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Update heartbeat
+    - name: Update heartbeat
         run: |
           NOW=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 
-          curl --fail --show-error -X PATCH \
+          HTTP_CODE=$(curl \
+            --fail \
+            --show-error \
+            --silent \
+            --write-out "%{http_code}" \
+            -X PATCH \
             "${{ secrets.SUPABASE_URL }}/rest/v1/heartbeat?id=eq.1" \
             -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
             -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}" \
             -H "Content-Type: application/json" \
-            -d "{\"updated_at\":\"$NOW\"}"
+            -d "{\"updated_at\":\"$NOW\"}")
 
-            echo "HTTP Status: $HTTP_CODE"
+          echo "HTTP Status: $HTTP_CODE"
