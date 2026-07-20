@@ -3,14 +3,19 @@ on:
   schedule:
     # 매일 한국 시간(KST) 새벽 4:00에 실행되도록 설정 (UTC 19:00)
     - cron: "0 19 * * *"
-  workflow_dispatch: # GitHub 대시보드 수동 실행버튼 활성화
+  workflow_dispatch: # GitHub 대시보드 수동 활성화-update
 jobs:
   ping:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Send Ping to Supabase
+      - name: Update heartbeat
         run: |
-          # queryMaster 테이블에서 ID를 딱 1건만 조회하여 확실한 DB 액티비티를 발생시킵니다.
-          curl -i -X GET "${{ secrets.SUPABASE_URL }}/rest/v1/queryMaster?select=ID&limit=1" \
-          -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
-          -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}"
+          NOW=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+
+          curl --fail --show-error -X PATCH \
+            "${{ secrets.SUPABASE_URL }}/rest/v1/heartbeat?id=eq.1" \
+            -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}" \
+            -H "Content-Type: application/json" \
+            -d "{\"updated_at\":\"$NOW\"}"
