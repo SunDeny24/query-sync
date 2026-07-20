@@ -19,3 +19,5 @@ jobs:
             -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}" \
             -H "Content-Type: application/json" \
             -d "{\"updated_at\":\"$NOW\"}"
+
+echo "HTTP Status: $HTTP_CODE"
